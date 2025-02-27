@@ -56,9 +56,10 @@ def gioco():
     if "inizio" not in st.session_state:
         st.session_state.inizio = time.time()
 
-    # Mostra il cronometro in alto a destra
+    # Mostra il cronometro in tempo reale
     tempo_trascorso = time.time() - st.session_state.inizio
-    st.sidebar.write(f"⏱️ Tempo trascorso: {int(tempo_trascorso)} secondi")
+    cronometro = st.sidebar.empty()  # Usiamo un placeholder per aggiornare il tempo
+    cronometro.write(f"⏱️ Tempo trascorso: {int(tempo_trascorso)} secondi")
 
     livello = st.session_state.livello_corrente
     frase_idx = st.session_state.frase_corrente
