@@ -115,6 +115,5 @@ if "username" not in st.session_state:
     username = st.text_input("Username:")
     if username:
         st.session_state.username = username
-        st.experimental_rerun()  # Ricarica l'app per avviare il gioco
 else:
     gioco()
