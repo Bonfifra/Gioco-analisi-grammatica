@@ -112,9 +112,15 @@ def gioco():
 st.title("🎮 Gioco di Analisi Logica")
 st.write("Benvenuto! Inserisci il tuo username per iniziare.")
 
+# Inizializza lo stato dell'app
 if "username" not in st.session_state:
+    st.session_state.username = None
+
+# Input dell'username
+if st.session_state.username is None:
     username = st.text_input("Username:")
     if username:
         st.session_state.username = username
+        st.experimental_rerun()  # Ricarica l'app per avviare il gioco
 else:
     gioco()
