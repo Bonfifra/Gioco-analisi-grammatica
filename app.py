@@ -118,6 +118,3 @@ if "username" not in st.session_state:
         st.experimental_rerun()  # Ricarica l'app per avviare il gioco
 else:
     gioco()
-    st.write(f"Ciao, {username}! Pronto a giocare?")
-    if st.button("Inizia il gioco"):
-        gioco(username)
