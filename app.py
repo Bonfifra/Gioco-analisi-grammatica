@@ -87,6 +87,7 @@ def gioco():
             st.session_state.punteggio += 1
             st.session_state.frase_corrente += 1
 
+            # Controlla se tutte le frasi del livello sono state completate
             if st.session_state.frase_corrente >= len(livelli[livello]):
                 st.session_state.livello_corrente += 1
                 st.session_state.frase_corrente = 0
