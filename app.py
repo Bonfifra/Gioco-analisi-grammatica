@@ -46,63 +46,78 @@ livelli = {
 }
 
 # Funzione principale del gioco
-def gioco(username):
-    punteggio = 0
-    inizio = time.time()
-    
-    for livello, frasi in livelli.items():
-        st.write(f"### Livello {livello}")
-        for frase in frasi:
-            st.write(f"**Frase:** {frase['frase']}")
-            soggetto = st.text_input("Soggetto:", key=f"soggetto_{livello}_{frase['frase']}")
-            predicato = st.text_input("Predicato:", key=f"predicato_{livello}_{frase['frase']}")
-            complemento = st.text_input("Complemento (se presente):", key=f"complemento_{livello}_{frase['frase']}")
-            
-            if st.button("Verifica", key=f"verifica_{livello}_{frase['frase']}"):
-                if not verifica_risposta(soggetto, frase["soggetto"]):
-                    st.error("Soggetto errato! Riprova.")
+def gioco():
+    if "livello_corrente" not in st.session_state:
+        st.session_state.livello_corrente = 1
+    if "frase_corrente" not in st.session_state:
+        st.session_state.frase_corrente = 0
+    if "punteggio" not in st.session_state:
+        st.session_state.punteggio = 0
+    if "inizio" not in st.session_state:
+        st.session_state.inizio = time.time()
+
+    livello = st.session_state.livello_corrente
+    frase_idx = st.session_state.frase_corrente
+    frase = livelli[livello][frase_idx]
+
+    st.write(f"### Livello {livello}")
+    st.write(f"**Frase:** {frase['frase']}")
+
+    soggetto = st.text_input("Soggetto:", key=f"soggetto_{livello}_{frase_idx}")
+    predicato = st.text_input("Predicato:", key=f"predicato_{livello}_{frase_idx}")
+    complemento = st.text_input("Complemento (se presente):", key=f"complemento_{livello}_{frase_idx}")
+
+    if st.button("Verifica", key=f"verifica_{livello}_{frase_idx}"):
+        if not verifica_risposta(soggetto, frase["soggetto"]):
+            st.error("Soggetto errato! Riprova.")
+        elif not verifica_risposta(predicato, frase["predicato"]):
+            st.error("Predicato errato! Riprova.")
+        elif "complemento_oggetto" in frase and not verifica_risposta(complemento, frase["complemento_oggetto"]):
+            st.error("Complemento oggetto errato! Riprova.")
+        elif "complemento_specificazione" in frase and not verifica_risposta(complemento, frase["complemento_specificazione"]):
+            st.error("Complemento di specificazione errato! Riprova.")
+        elif "complemento_termine" in frase and not verifica_risposta(complemento, frase["complemento_termine"]):
+            st.error("Complemento di termine errato! Riprova.")
+        elif "complemento_agente" in frase and not verifica_risposta(complemento, frase["complemento_agente"]):
+            st.error("Complemento d'agente errato! Riprova.")
+        elif "complemento_predicativo" in frase and not verifica_risposta(complemento, frase["complemento_predicativo"]):
+            st.error("Complemento predicativo errato! Riprova.")
+        else:
+            st.success("Corretto! Complimenti.")
+            st.session_state.punteggio += 1
+            st.session_state.frase_corrente += 1
+
+            if st.session_state.frase_corrente >= len(livelli[livello]):
+                st.session_state.livello_corrente += 1
+                st.session_state.frase_corrente = 0
+                if st.session_state.livello_corrente > len(livelli):
+                    fine = time.time()
+                    tempo_totale = fine - st.session_state.inizio
+                    st.write(f"### 🎉 Hai completato tutti i livelli in {tempo_totale:.2f} secondi!")
+                    
+                    # Salva il punteggio nella classifica
+                    if "classifica" not in st.session_state:
+                        st.session_state.classifica = pd.DataFrame(columns=["Username", "Tempo"])
+                    st.session_state.classifica = st.session_state.classifica.append(
+                        {"Username": st.session_state.username, "Tempo": tempo_totale}, ignore_index=True
+                    )
+                    st.write("### 🏆 Classifica")
+                    st.write(st.session_state.classifica.sort_values(by="Tempo"))
                     return
-                if not verifica_risposta(predicato, frase["predicato"]):
-                    st.error("Predicato errato! Riprova.")
-                    return
-                if "complemento_oggetto" in frase and not verifica_risposta(complemento, frase["complemento_oggetto"]):
-                    st.error("Complemento oggetto errato! Riprova.")
-                    return
-                if "complemento_specificazione" in frase and not verifica_risposta(complemento, frase["complemento_specificazione"]):
-                    st.error("Complemento di specificazione errato! Riprova.")
-                    return
-                if "complemento_termine" in frase and not verifica_risposta(complemento, frase["complemento_termine"]):
-                    st.error("Complemento di termine errato! Riprova.")
-                    return
-                if "complemento_agente" in frase and not verifica_risposta(complemento, frase["complemento_agente"]):
-                    st.error("Complemento d'agente errato! Riprova.")
-                    return
-                if "complemento_predicativo" in frase and not verifica_risposta(complemento, frase["complemento_predicativo"]):
-                    st.error("Complemento predicativo errato! Riprova.")
-                    return
-                
-                st.success("Corretto! Complimenti.")
-                punteggio += 1
-        
-        st.write(f"Complimenti! Hai completato il livello {livello}.")
-    
-    fine = time.time()
-    tempo_totale = fine - inizio
-    st.write(f"### 🎉 Hai completato tutti i livelli in {tempo_totale:.2f} secondi!")
-    
-    # Salva il punteggio nella classifica
-    if "classifica" not in st.session_state:
-        st.session_state.classifica = pd.DataFrame(columns=["Username", "Tempo"])
-    st.session_state.classifica = st.session_state.classifica.append({"Username": username, "Tempo": tempo_totale}, ignore_index=True)
-    st.write("### 🏆 Classifica")
-    st.write(st.session_state.classifica.sort_values(by="Tempo"))
+
+                st.write(f"Complimenti! Passi al livello {st.session_state.livello_corrente}.")
 
 # Interfaccia iniziale
 st.title("🎮 Gioco di Analisi Logica")
 st.write("Benvenuto! Inserisci il tuo username per iniziare.")
 
-username = st.text_input("Username:")
-if username:
+if "username" not in st.session_state:
+    username = st.text_input("Username:")
+    if username:
+        st.session_state.username = username
+        st.experimental_rerun()  # Ricarica l'app per avviare il gioco
+else:
+    gioco()
     st.write(f"Ciao, {username}! Pronto a giocare?")
     if st.button("Inizia il gioco"):
         gioco(username)
