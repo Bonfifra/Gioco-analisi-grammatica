@@ -56,12 +56,20 @@ def gioco():
     if "inizio" not in st.session_state:
         st.session_state.inizio = time.time()
 
+    # Mostra il cronometro in alto a destra
+    tempo_trascorso = time.time() - st.session_state.inizio
+    st.sidebar.write(f"⏱️ Tempo trascorso: {int(tempo_trascorso)} secondi")
+
     livello = st.session_state.livello_corrente
     frase_idx = st.session_state.frase_corrente
     frase = livelli[livello][frase_idx]
 
     st.write(f"### Livello {livello}")
     st.write(f"**Frase:** {frase['frase']}")
+
+    # Mostra un messaggio specifico per il livello 1
+    if livello == 1:
+        st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento Oggetto**.")
 
     soggetto = st.text_input("Soggetto:", key=f"soggetto_{livello}_{frase_idx}")
     predicato = st.text_input("Predicato:", key=f"predicato_{livello}_{frase_idx}")
@@ -87,8 +95,10 @@ def gioco():
             st.session_state.punteggio += 1
             st.session_state.frase_corrente += 1
 
-            # Controlla se tutte le frasi del livello sono state completate
-            if st.session_state.frase_corrente >= len(livelli[livello]):
+            # Passa automaticamente alla frase successiva
+            if st.session_state.frase_corrente < len(livelli[livello]):
+                st.experimental_rerun()  # Ricarica l'app per mostrare la prossima frase
+            else:
                 st.session_state.livello_corrente += 1
                 st.session_state.frase_corrente = 0
                 if st.session_state.livello_corrente > len(livelli):
@@ -106,7 +116,10 @@ def gioco():
                     st.write(st.session_state.classifica.sort_values(by="Tempo"))
                     return
 
-                st.write(f"Complimenti! Passi al livello {st.session_state.livello_corrente}.")
+                # Segnala il passaggio al livello successivo
+                st.balloons()  # Effetto visivo
+                st.write(f"🎉 **Complimenti! Passi al livello {st.session_state.livello_corrente}.**")
+                st.experimental_rerun()  # Ricarica l'app per mostrare il nuovo livello
 
 # Interfaccia iniziale
 st.title("🎮 Gioco di Analisi Logica")
