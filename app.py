@@ -59,8 +59,8 @@ def gioco():
         st.session_state.risposta_corretta = False
 
     # Mostra il cronometro in tempo reale
-    tempo_trascorso = time.time() - st.session_state.inizio
     cronometro = st.sidebar.empty()  # Usiamo un placeholder per aggiornare il tempo
+    tempo_trascorso = time.time() - st.session_state.inizio
     cronometro.write(f"⏱️ Tempo trascorso: {int(tempo_trascorso)} secondi")
 
     livello = st.session_state.livello_corrente
@@ -112,7 +112,7 @@ def gioco():
 
             # Passa alla frase successiva o al livello successivo
             if st.session_state.frase_corrente < len(livelli[livello]):
-                st.experimental_rerun()  # Ricarica l'app per mostrare la prossima frase
+                st.session_state.frase_corrente += 1
             else:
                 st.session_state.livello_corrente += 1
                 st.session_state.frase_corrente = 0
@@ -134,7 +134,6 @@ def gioco():
                 # Segnala il passaggio al livello successivo
                 st.balloons()  # Effetto visivo
                 st.write(f"🎉 **Complimenti! Passi al livello {st.session_state.livello_corrente}.**")
-                st.experimental_rerun()  # Ricarica l'app per mostrare il nuovo livello
 
 # Interfaccia iniziale
 st.title("🎮 Gioco di Analisi Logica")
@@ -149,6 +148,5 @@ if st.session_state.username is None:
     username = st.text_input("Username:")
     if username:
         st.session_state.username = username
-        st.experimental_rerun()  # Ricarica l'app per avviare il gioco
 else:
     gioco()
