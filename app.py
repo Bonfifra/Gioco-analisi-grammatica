@@ -55,6 +55,8 @@ def gioco():
         st.session_state.punteggio = 0
     if "inizio" not in st.session_state:
         st.session_state.inizio = time.time()
+    if "risposta_corretta" not in st.session_state:
+        st.session_state.risposta_corretta = False
 
     # Mostra il cronometro in tempo reale
     tempo_trascorso = time.time() - st.session_state.inizio
@@ -68,9 +70,15 @@ def gioco():
     st.write(f"### Livello {livello}")
     st.write(f"**Frase:** {frase['frase']}")
 
-    # Mostra un messaggio specifico per il livello 1
+    # Messaggi specifici per ogni livello
     if livello == 1:
         st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento Oggetto**.")
+    elif livello == 3:
+        st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento di Termine**.")
+    elif livello == 4:
+        st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento d'Agente o di Causa Efficiente**.")
+    elif livello == 5:
+        st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento Predicativo del Soggetto o dell'Oggetto**.")
 
     soggetto = st.text_input("Soggetto:", key=f"soggetto_{livello}_{frase_idx}")
     predicato = st.text_input("Predicato:", key=f"predicato_{livello}_{frase_idx}")
@@ -93,10 +101,16 @@ def gioco():
             st.error("Complemento predicativo errato! Riprova.")
         else:
             st.success("Corretto! Complimenti.")
+            st.session_state.risposta_corretta = True
+
+    # Mostra il pulsante "Successiva" solo se la risposta è corretta
+    if st.session_state.risposta_corretta:
+        if st.button("Successiva", key=f"successiva_{livello}_{frase_idx}"):
             st.session_state.punteggio += 1
             st.session_state.frase_corrente += 1
+            st.session_state.risposta_corretta = False
 
-            # Passa automaticamente alla frase successiva
+            # Passa alla frase successiva o al livello successivo
             if st.session_state.frase_corrente < len(livelli[livello]):
                 st.experimental_rerun()  # Ricarica l'app per mostrare la prossima frase
             else:
