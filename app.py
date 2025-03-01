@@ -174,7 +174,7 @@ def gioco():
                 st.write(f"🎉 **Complimenti! Passi al livello {st.session_state.livello_corrente}.**")
 
 # Interfaccia iniziale
-st.title("🎮 Gioco di Analisi Logicaa")
+st.title("🎮 Gioco di Analisi Logica")
 st.write("Benvenuto! Inserisci il tuo username per iniziare.")
 
 # Inizializza lo stato dell'app
