@@ -158,7 +158,11 @@ st.title("🎮 Gioco di Analisi Logica")
 st.write("Benvenuto! Inserisci il tuo username per iniziare.")
 
 # Inizializza lo stato dell'app
-if "username" not in st.session_state or st.session_state.username is None:
+if "username" not in st.session_state:
+    st.session_state.username = None
+
+# Input dell'username
+if st.session_state.username is None:
     username = st.text_input("Username:")
     if username and username.strip():  # Verifica che l'username non sia vuoto
         st.session_state.username = username.strip()  # Rimuovi spazi bianchi
