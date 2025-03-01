@@ -45,16 +45,31 @@ livelli = {
     ]
 }
 
-# Funzione principale del gioco
-def gioco():
+# Funzione per il passo 1: Inserimento dell'username
+def passo_1():
+    st.title("🎮 Gioco di Analisi Logica")
+    st.write("Benvenuto! Inserisci il tuo username per iniziare.")
+
+    username = st.text_input("Username:")
+    if st.button("Inizia il gioco"):
+        if username and username.strip():  # Verifica che l'username non sia vuoto
+            st.session_state.username = username.strip()
+            st.session_state.passo_corrente = 2  # Passa al passo 2
+            st.session_state.inizio = time.time()  # Memorizza l'ora di inizio
+            st.experimental_rerun()  # Ricarica la pagina
+
+# Funzione per il passo 2: Gioco
+def passo_2():
+    st.title("🎮 Gioco di Analisi Logica")
+    st.write(f"Ciao, {st.session_state.username}! Iniziamo il gioco.")
+
+    # Inizializza lo stato del gioco se non è già stato fatto
     if "livello_corrente" not in st.session_state:
         st.session_state.livello_corrente = 1
     if "frase_corrente" not in st.session_state:
         st.session_state.frase_corrente = 0
     if "punteggio" not in st.session_state:
         st.session_state.punteggio = 0
-    if "inizio" not in st.session_state:
-        st.session_state.inizio = time.time()
     if "risposta_corretta" not in st.session_state:
         st.session_state.risposta_corretta = False
 
@@ -130,44 +145,52 @@ def gioco():
                 st.session_state.livello_corrente += 1
                 st.session_state.frase_corrente = 0
                 if st.session_state.livello_corrente > len(livelli):
-                    fine = time.time()
-                    tempo_totale = fine - st.session_state.inizio
-                    st.write(f"### 🎉 Hai completato tutti i livelli in {tempo_totale:.2f} secondi!")
-                    # Salva il punteggio nella classifica
-                    if "classifica" not in st.session_state:
-                        st.session_state.classifica = pd.DataFrame(columns=["Username", "Tempo"])
-                    st.session_state.classifica = st.session_state.classifica.append(
-                        {"Username": username, "Tempo": tempo_totale}, ignore_index=True
-                    )
-                    st.write("### 🏆 Classifica")
-                    st.write(st.session_state.classifica.sort_values(by="Tempo"))
-                    if st.button("Ricomincia"):
-                        st.session_state.livello_corrente = 1
-                        st.session_state.frase_corrente = 0
-                        st.session_state.punteggio = 0
-                        st.session_state.inizio = time.time()
-                        st.session_state.risposta_corretta = False
-                        st.experimental_rerun()
-                    return
-                st.balloons()  # Effetto visivo
-                st.write(f"🎉 **Complimenti! Passi al livello {st.session_state.livello_corrente}.**")
-            st.experimental_rerun()  # Ricarica la pagina per aggiornare lo stato
+                    st.session_state.passo_corrente = 3  # Passa al passo 3 (fine del gioco)
+                    st.experimental_rerun()
+                else:
+                    st.balloons()  # Effetto visivo
+                    st.write(f"🎉 **Complimenti! Passi al livello {st.session_state.livello_corrente}.**")
+                    st.experimental_rerun()  # Ricarica la pagina per aggiornare lo stato
 
-# Interfaccia iniziale
-st.title("🎮 Gioco di Analisi Logica")
-st.write("Benvenuto! Inserisci il tuo username per iniziare.")
+# Funzione per il passo 3: Fine del gioco e classifica
+def passo_3():
+    st.title("🎮 Gioco di Analisi Logica")
+    st.write("### 🎉 Hai completato tutti i livelli!")
 
-# Usa una variabile semplice per memorizzare l'username
-username = None
-gioco_iniziato = False
+    # Calcola il tempo totale
+    fine = time.time()
+    tempo_totale = fine - st.session_state.inizio
+    st.write(f"Hai impiegato {int(tempo_totale)} secondi.")
 
-# Input dell'username
-username_input = st.text_input("Username:")
-if st.button("Inizia il gioco"):
-    if username_input and username_input.strip():  # Verifica che l'username non sia vuoto
-        username = username_input.strip()
-        gioco_iniziato = True
+    # Salva il punteggio nella classifica
+    if "classifica" not in st.session_state:
+        st.session_state.classifica = pd.DataFrame(columns=["Username", "Tempo"])
+    st.session_state.classifica = st.session_state.classifica.append(
+        {"Username": st.session_state.username, "Tempo": tempo_totale}, ignore_index=True
+    )
 
-# Se il gioco è stato avviato, passa alla funzione gioco
-if gioco_iniziato:
-    gioco()
+    # Mostra la classifica
+    st.write("### 🏆 Classifica")
+    st.write(st.session_state.classifica.sort_values(by="Tempo"))
+
+    if st.button("Ricomincia"):
+        # Resetta lo stato del gioco
+        st.session_state.passo_corrente = 1
+        st.session_state.username = None
+        st.session_state.livello_corrente = 1
+        st.session_state.frase_corrente = 0
+        st.session_state.punteggio = 0
+        st.session_state.risposta_corretta = False
+        st.experimental_rerun()
+
+# Inizializza lo stato della sessione
+if "passo_corrente" not in st.session_state:
+    st.session_state.passo_corrente = 1
+
+# Mostra il passo corretto
+if st.session_state.passo_corrente == 1:
+    passo_1()
+elif st.session_state.passo_corrente == 2:
+    passo_2()
+elif st.session_state.passo_corrente == 3:
+    passo_3()
