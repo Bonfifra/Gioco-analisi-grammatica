@@ -157,15 +157,16 @@ def gioco():
 st.title("🎮 Gioco di Analisi Logica")
 st.write("Benvenuto! Inserisci il tuo username per iniziare.")
 
-# Inizializza lo stato dell'app
-if "username" not in st.session_state:
-    st.session_state.username = None
-
-# Input dell'username
-if st.session_state.username is None:
+# Usa un form per l'inserimento dell'username
+with st.form("username_form"):
     username = st.text_input("Username:")
-    if username and username.strip():  # Verifica che l'username non sia vuoto
-        st.session_state.username = username.strip()  # Rimuovi spazi bianchi
-        st.experimental_rerun()  # Ricarica la pagina per aggiornare lo stato
-else:
+    submit_button = st.form_submit_button("Inizia il gioco")
+
+# Se il form è stato inviato, salva l'username e passa alla funzione gioco
+if submit_button and username:
+    st.session_state.username = username.strip()
+    st.experimental_rerun()
+
+# Se l'username è stato impostato, avvia il gioco
+if "username" in st.session_state and st.session_state.username:
     gioco()
