@@ -137,7 +137,7 @@ def gioco():
                     if "classifica" not in st.session_state:
                         st.session_state.classifica = pd.DataFrame(columns=["Username", "Tempo"])
                     st.session_state.classifica = st.session_state.classifica.append(
-                        {"Username": st.session_state.username, "Tempo": tempo_totale}, ignore_index=True
+                        {"Username": username, "Tempo": tempo_totale}, ignore_index=True
                     )
                     st.write("### 🏆 Classifica")
                     st.write(st.session_state.classifica.sort_values(by="Tempo"))
@@ -157,16 +157,17 @@ def gioco():
 st.title("🎮 Gioco di Analisi Logica")
 st.write("Benvenuto! Inserisci il tuo username per iniziare.")
 
-# Inizializza lo stato dell'app
-if "username" not in st.session_state:
-    st.session_state.username = None
+# Usa una variabile semplice per memorizzare l'username
+username = None
+gioco_iniziato = False
 
 # Input dell'username
-if st.session_state.username is None:
-    username = st.text_input("Username:")
-    if st.button("Inizia il gioco"):
-        if username and username.strip():  # Verifica che l'username non sia vuoto
-            st.session_state.username = username.strip()
-            st.experimental_rerun()  # Ricarica la pagina per aggiornare lo stato
-else:
+username_input = st.text_input("Username:")
+if st.button("Inizia il gioco"):
+    if username_input and username_input.strip():  # Verifica che l'username non sia vuoto
+        username = username_input.strip()
+        gioco_iniziato = True
+
+# Se il gioco è stato avviato, passa alla funzione gioco
+if gioco_iniziato:
     gioco()
