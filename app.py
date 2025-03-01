@@ -6,6 +6,12 @@ import pandas as pd
 def verifica_risposta(risposta, corretta):
     return risposta.strip().lower() == corretta.strip().lower()
 
+# Funzione per formattare il tempo in minuti e secondi
+def formatta_tempo(tempo_totale):
+    minuti = int(tempo_totale // 60)
+    secondi = int(tempo_totale % 60)
+    return f"{minuti}:{secondi:02d}"  # Formato MM:SS
+
 # Definizione delle frasi per ogni livello
 livelli = {
     1: [
@@ -61,7 +67,10 @@ def gioco():
     # Mostra il cronometro in tempo reale
     cronometro = st.sidebar.empty()
     tempo_trascorso = time.time() - st.session_state.inizio
-    cronometro.write(f"⏱️ Tempo trascorso: {int(tempo_trascorso)} secondi")
+    if tempo_trascorso > 60:
+        cronometro.write(f"⏱️ Tempo trascorso: {formatta_tempo(tempo_trascorso)}")
+    else:
+        cronometro.write(f"⏱️ Tempo trascorso: {int(tempo_trascorso)} secondi")
 
     livello = st.session_state.livello_corrente
     frase_idx = st.session_state.frase_corrente
@@ -73,6 +82,8 @@ def gioco():
     # Messaggi specifici per ogni livello
     if livello == 1:
         st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento Oggetto**.")
+    elif livello == 2:
+        st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento di Specificazione**.")
     elif livello == 3:
         st.write("⚠️ **Nota:** In questo livello, i complementi presenti sono il **Complemento Oggetto** e il **Complemento di Termine**.")
     elif livello == 4:
@@ -84,28 +95,33 @@ def gioco():
     soggetto = st.text_input("Soggetto:", key=f"soggetto_{livello}_{frase_idx}", value="")
     predicato = st.text_input("Predicato:", key=f"predicato_{livello}_{frase_idx}", value="")
 
-    # Input per i complementi (gestione diversa per il livello 3 e 4)
-    if livello >= 3:
+    # Input per i complementi (gestione diversa per ogni livello)
+    if livello == 2:
+        complemento_specificazione = st.text_input("Complemento di Specificazione:", key=f"complemento_specificazione_{livello}_{frase_idx}", value="")
+    elif livello == 3:
         complemento_oggetto = st.text_input("Complemento Oggetto:", key=f"complemento_oggetto_{livello}_{frase_idx}", value="")
         complemento_termine = st.text_input("Complemento di Termine:", key=f"complemento_termine_{livello}_{frase_idx}", value="")
-    if livello >= 4:
+    elif livello == 4:
         complemento_agente = st.text_input("Complemento d'Agente o di Causa Efficiente:", key=f"complemento_agente_{livello}_{frase_idx}", value="")
+    elif livello == 5:
+        complemento_predicativo = st.text_input("Complemento Predicativo del Soggetto o dell'Oggetto:", key=f"complemento_predicativo_{livello}_{frase_idx}", value="")
 
     if st.button("Verifica", key=f"verifica_{livello}_{frase_idx}"):
         if not verifica_risposta(soggetto, frase["soggetto"]):
             st.error("Soggetto errato! Riprova.")
         elif not verifica_risposta(predicato, frase["predicato"]):
             st.error("Predicato errato! Riprova.")
-        elif livello >= 3:
+        elif livello == 2 and "complemento_specificazione" in frase and not verifica_risposta(complemento_specificazione, frase["complemento_specificazione"]):
+            st.error("Complemento di specificazione errato! Riprova.")
+        elif livello == 3:
             if "complemento_oggetto" in frase and not verifica_risposta(complemento_oggetto, frase["complemento_oggetto"]):
                 st.error("Complemento oggetto errato! Riprova.")
             elif "complemento_termine" in frase and not verifica_risposta(complemento_termine, frase["complemento_termine"]):
                 st.error("Complemento di termine errato! Riprova.")
-            elif livello >= 4 and "complemento_agente" in frase and not verifica_risposta(complemento_agente, frase["complemento_agente"]):
-                st.error("Complemento d'agente errato! Riprova.")
-            else:
-                st.success("Corretto! Complimenti.")
-                st.session_state.risposta_corretta = True
+        elif livello == 4 and "complemento_agente" in frase and not verifica_risposta(complemento_agente, frase["complemento_agente"]):
+            st.error("Complemento d'agente errato! Riprova.")
+        elif livello == 5 and "complemento_predicativo" in frase and not verifica_risposta(complemento_predicativo, frase["complemento_predicativo"]):
+            st.error("Complemento predicativo errato! Riprova.")
         else:
             st.success("Corretto! Complimenti.")
             st.session_state.risposta_corretta = True
@@ -124,12 +140,12 @@ def gioco():
                 if st.session_state.livello_corrente > len(livelli):
                     fine = time.time()
                     tempo_totale = fine - st.session_state.inizio
-                    st.write(f"### 🎉 Hai completato tutti i livelli in {tempo_totale:.2f} secondi!")
+                    st.write(f"### 🎉 Hai completato tutti i livelli in {formatta_tempo(tempo_totale)}!")
                     # Salva il punteggio nella classifica
                     if "classifica" not in st.session_state:
                         st.session_state.classifica = pd.DataFrame(columns=["Username", "Tempo"])
                     st.session_state.classifica = st.session_state.classifica.append(
-                        {"Username": st.session_state.username, "Tempo": tempo_totale}, ignore_index=True
+                        {"Username": st.session_state.username, "Tempo": formatta_tempo(tempo_totale)}, ignore_index=True
                     )
                     st.write("### 🏆 Classifica")
                     st.write(st.session_state.classifica.sort_values(by="Tempo"))
