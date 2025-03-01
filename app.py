@@ -50,6 +50,13 @@ livelli = {
         {"frase": "Il disegno è stato fatto da un artista.", "soggetto": "Il disegno", "predicato": "è stato fatto", "complemento_agente": "da un artista"}
     ],
     6: [
+        {"frase": "Io mangio un trancio di pizza.", "soggetto": "Io", "predicato": "mangio", "complemento_oggetto": "un trancio", "complemento_partitivo": "di pizza"},
+        {"frase": "Alcuni degli studenti hanno fatto una buona verifica.", "soggetto": "Alcuni", "predicato": "hanno fatto", "complemento_oggetto": "una buona verifica", "complemento_partitivo": "degli studenti"},
+        {"frase": "Molti di loro sono entrati.", "soggetto": "Molti", "predicato": "sono entrati", "complemento_partitivo": "di loro"},
+        {"frase": "Tre fette di torta sono troppe.", "soggetto": "Tre fette", "predicato": "sono troppe", "complemento_partitivo": "di torta"},
+        {"frase": "Alcuni tra i fratelli non hanno firmato.", "soggetto": "Alcuni", "predicato": "non hanno firmato", "complemento_partitivo": "tra i fratelli"}
+    ],
+    7: [
         {"frase": "Marco è considerato un genio.", "soggetto": "Marco", "predicato": "è considerato", "complemento_predicativo": "un genio"},
         {"frase": "La torta sembra deliziosa.", "soggetto": "La torta", "predicato": "sembra", "complemento_predicativo": "deliziosa"},
         {"frase": "Il professore ha nominato Lucia rappresentante.", "soggetto": "Il professore", "predicato": "ha nominato", "complemento_oggetto": "Lucia", "complemento_predicativo": "rappresentante"},
@@ -98,6 +105,8 @@ def gioco():
     elif livello == 5:
         st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento d'Agente o di Causa Efficiente**.")
     elif livello == 6:
+        st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento Partitivo**.")
+    elif livello == 7:
         st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento Predicativo del Soggetto o dell'Oggetto**.")
 
     # Input per soggetto e predicato
@@ -115,16 +124,11 @@ def gioco():
     elif livello == 5:
         complemento_agente = st.text_input("Complemento d'Agente o di Causa Efficiente:", key=f"complemento_agente_{livello}_{frase_idx}", value="")
     elif livello == 6:
+        complemento_partitivo = st.text_input("Complemento Partitivo:", key=f"complemento_partitivo_{livello}_{frase_idx}", value="")
+    elif livello == 7:
         complemento_predicativo = st.text_input("Complemento Predicativo del Soggetto o dell'Oggetto:", key=f"complemento_predicativo_{livello}_{frase_idx}", value="")
 
     if st.button("Verifica", key=f"verifica_{livello}_{frase_idx}"):
-        # Debug: mostra le risposte inserite e quelle corrette
-        st.write(f"Debug - Soggetto inserito: '{soggetto}', Soggetto corretto: '{frase['soggetto']}'")
-        st.write(f"Debug - Predicato inserito: '{predicato}', Predicato corretto: '{frase['predicato']}'")
-        if livello == 4:
-            st.write(f"Debug - Complemento oggetto inserito: '{complemento_oggetto}', Complemento oggetto corretto: '{frase['complemento_oggetto']}'")
-            st.write(f"Debug - Complemento termine inserito: '{complemento_termine}', Complemento termine corretto: '{frase['complemento_termine']}'")
-
         # Verifica le risposte
         if not verifica_risposta(soggetto, frase["soggetto"]):
             st.error("Soggetto errato! Riprova.")
@@ -144,7 +148,9 @@ def gioco():
                 st.session_state.risposta_corretta = True
         elif livello == 5 and "complemento_agente" in frase and not verifica_risposta(complemento_agente, frase["complemento_agente"]):
             st.error("Complemento d'agente errato! Riprova.")
-        elif livello == 6 and "complemento_predicativo" in frase and not verifica_risposta(complemento_predicativo, frase["complemento_predicativo"]):
+        elif livello == 6 and "complemento_partitivo" in frase and not verifica_risposta(complemento_partitivo, frase["complemento_partitivo"]):
+            st.error("Complemento partitivo errato! Riprova.")
+        elif livello == 7 and "complemento_predicativo" in frase and not verifica_risposta(complemento_predicativo, frase["complemento_predicativo"]):
             st.error("Complemento predicativo errato! Riprova.")
         else:
             st.success("Corretto! Complimenti.")
