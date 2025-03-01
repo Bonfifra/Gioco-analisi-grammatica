@@ -22,27 +22,34 @@ livelli = {
         {"frase": "La torta è deliziosa.", "soggetto": "La torta", "predicato": "è deliziosa"}
     ],
     2: [
+        {"frase": "La penna del maestro è sul tavolo.", "soggetto": "La penna", "predicato": "è", "complemento_specificazione": "del maestro"},
         {"frase": "Il libro di Marco è interessante.", "soggetto": "Il libro", "predicato": "è interessante", "complemento_specificazione": "di Marco"},
-        {"frase": "La città di Roma è antica.", "soggetto": "La città", "predicato": "è antica", "complemento_specificazione": "di Roma"},
         {"frase": "Il gatto di Lucia è bianco.", "soggetto": "Il gatto", "predicato": "è bianco", "complemento_specificazione": "di Lucia"},
         {"frase": "La penna di Paolo è nuova.", "soggetto": "La penna", "predicato": "è nuova", "complemento_specificazione": "di Paolo"},
         {"frase": "Il fiore del giardino è bello.", "soggetto": "Il fiore", "predicato": "è bello", "complemento_specificazione": "del giardino"}
     ],
     3: [
+        {"frase": "La città di Roma è bella.", "soggetto": "La città", "predicato": "è bella", "complemento_denominazione": "di Roma"},
+        {"frase": "Il lago di Garda è di origine glaciale.", "soggetto": "Il lago", "predicato": "è di origine glaciale", "complemento_denominazione": "di Garda"},
+        {"frase": "Luca nuotò nel lago di Bracciano.", "soggetto": "Luca", "predicato": "nuotò", "complemento_denominazione": "di Bracciano"},
+        {"frase": "Mario è della città di Bergamo.", "soggetto": "Mario", "predicato": "è", "complemento_denominazione": "di Bergamo"},
+        {"frase": "La città di Venezia è una città lagunare.", "soggetto": "La città", "predicato": "è una città lagunare", "complemento_denominazione": "di Venezia"}
+    ],
+    4: [
         {"frase": "Marco regala un libro a Lucia.", "soggetto": "Marco", "predicato": "regala", "complemento_oggetto": "un libro", "complemento_termine": "a Lucia"},
         {"frase": "Il professore spiega la lezione agli studenti.", "soggetto": "Il professore", "predicato": "spiega", "complemento_oggetto": "la lezione", "complemento_termine": "agli studenti"},
         {"frase": "Io do un regalo a te.", "soggetto": "Io", "predicato": "do", "complemento_oggetto": "un regalo", "complemento_termine": "a te"},
         {"frase": "La mamma prepara la cena per la famiglia.", "soggetto": "La mamma", "predicato": "prepara", "complemento_oggetto": "la cena", "complemento_termine": "per la famiglia"},
         {"frase": "Il postino consegna una lettera a Maria.", "soggetto": "Il postino", "predicato": "consegna", "complemento_oggetto": "una lettera", "complemento_termine": "a Maria"}
     ],
-    4: [
+    5: [
         {"frase": "La torta è stata mangiata da Marco.", "soggetto": "La torta", "predicato": "è stata mangiata", "complemento_agente": "da Marco"},
         {"frase": "Il libro è stato scritto da uno scrittore famoso.", "soggetto": "Il libro", "predicato": "è stato scritto", "complemento_agente": "da uno scrittore famoso"},
         {"frase": "La casa è stata costruita da un architetto.", "soggetto": "La casa", "predicato": "è stata costruita", "complemento_agente": "da un architetto"},
         {"frase": "La mela è stata colta da un contadino.", "soggetto": "La mela", "predicato": "è stata colta", "complemento_agente": "da un contadino"},
         {"frase": "Il disegno è stato fatto da un artista.", "soggetto": "Il disegno", "predicato": "è stato fatto", "complemento_agente": "da un artista"}
     ],
-    5: [
+    6: [
         {"frase": "Marco è considerato un genio.", "soggetto": "Marco", "predicato": "è considerato", "complemento_predicativo": "un genio"},
         {"frase": "La torta sembra deliziosa.", "soggetto": "La torta", "predicato": "sembra", "complemento_predicativo": "deliziosa"},
         {"frase": "Il professore ha nominato Lucia rappresentante.", "soggetto": "Il professore", "predicato": "ha nominato", "complemento_oggetto": "Lucia", "complemento_predicativo": "rappresentante"},
@@ -85,10 +92,12 @@ def gioco():
     elif livello == 2:
         st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento di Specificazione**.")
     elif livello == 3:
-        st.write("⚠️ **Nota:** In questo livello, i complementi presenti sono il **Complemento Oggetto** e il **Complemento di Termine**.")
+        st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento di Denominazione**.")
     elif livello == 4:
-        st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento d'Agente o di Causa Efficiente**.")
+        st.write("⚠️ **Nota:** In questo livello, i complementi presenti sono il **Complemento Oggetto** e il **Complemento di Termine**.")
     elif livello == 5:
+        st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento d'Agente o di Causa Efficiente**.")
+    elif livello == 6:
         st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento Predicativo del Soggetto o dell'Oggetto**.")
 
     # Input per soggetto e predicato
@@ -99,11 +108,13 @@ def gioco():
     if livello == 2:
         complemento_specificazione = st.text_input("Complemento di Specificazione:", key=f"complemento_specificazione_{livello}_{frase_idx}", value="")
     elif livello == 3:
+        complemento_denominazione = st.text_input("Complemento di Denominazione:", key=f"complemento_denominazione_{livello}_{frase_idx}", value="")
+    elif livello == 4:
         complemento_oggetto = st.text_input("Complemento Oggetto:", key=f"complemento_oggetto_{livello}_{frase_idx}", value="")
         complemento_termine = st.text_input("Complemento di Termine:", key=f"complemento_termine_{livello}_{frase_idx}", value="")
-    elif livello == 4:
-        complemento_agente = st.text_input("Complemento d'Agente o di Causa Efficiente:", key=f"complemento_agente_{livello}_{frase_idx}", value="")
     elif livello == 5:
+        complemento_agente = st.text_input("Complemento d'Agente o di Causa Efficiente:", key=f"complemento_agente_{livello}_{frase_idx}", value="")
+    elif livello == 6:
         complemento_predicativo = st.text_input("Complemento Predicativo del Soggetto o dell'Oggetto:", key=f"complemento_predicativo_{livello}_{frase_idx}", value="")
 
     if st.button("Verifica", key=f"verifica_{livello}_{frase_idx}"):
@@ -113,14 +124,16 @@ def gioco():
             st.error("Predicato errato! Riprova.")
         elif livello == 2 and "complemento_specificazione" in frase and not verifica_risposta(complemento_specificazione, frase["complemento_specificazione"]):
             st.error("Complemento di specificazione errato! Riprova.")
-        elif livello == 3:
+        elif livello == 3 and "complemento_denominazione" in frase and not verifica_risposta(complemento_denominazione, frase["complemento_denominazione"]):
+            st.error("Complemento di denominazione errato! Riprova.")
+        elif livello == 4:
             if "complemento_oggetto" in frase and not verifica_risposta(complemento_oggetto, frase["complemento_oggetto"]):
                 st.error("Complemento oggetto errato! Riprova.")
             elif "complemento_termine" in frase and not verifica_risposta(complemento_termine, frase["complemento_termine"]):
                 st.error("Complemento di termine errato! Riprova.")
-        elif livello == 4 and "complemento_agente" in frase and not verifica_risposta(complemento_agente, frase["complemento_agente"]):
+        elif livello == 5 and "complemento_agente" in frase and not verifica_risposta(complemento_agente, frase["complemento_agente"]):
             st.error("Complemento d'agente errato! Riprova.")
-        elif livello == 5 and "complemento_predicativo" in frase and not verifica_risposta(complemento_predicativo, frase["complemento_predicativo"]):
+        elif livello == 6 and "complemento_predicativo" in frase and not verifica_risposta(complemento_predicativo, frase["complemento_predicativo"]):
             st.error("Complemento predicativo errato! Riprova.")
         else:
             st.success("Corretto! Complimenti.")
