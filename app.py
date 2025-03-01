@@ -139,26 +139,27 @@ def gioco():
                         st.session_state.punteggio = 0
                         st.session_state.inizio = time.time()
                         st.session_state.risposta_corretta = False
-                        st.experimental_rerun()
+                        st.session_state.pagina_corrente = "username"  # Torna alla pagina iniziale
                     return
                 st.balloons()  # Effetto visivo
                 st.write(f"🎉 **Complimenti! Passi al livello {st.session_state.livello_corrente}.**")
-            st.experimental_rerun()  # Ricarica la pagina per aggiornare lo stato
 
 # Interfaccia iniziale
 st.title("🎮 Gioco di Analisi Logica")
 st.write("Benvenuto! Inserisci il tuo username per iniziare.")
 
 # Inizializza lo stato dell'app
-if "username" not in st.session_state:
-    st.session_state.username = None
+if "pagina_corrente" not in st.session_state:
+    st.session_state.pagina_corrente = "username"
 
-# Input dell'username
-if st.session_state.username is None:
+# Pagina per l'inserimento dell'username
+if st.session_state.pagina_corrente == "username":
     username = st.text_input("Username:")
     if st.button("Inizia il gioco"):
         if username and username.strip():  # Verifica che l'username non sia vuoto
             st.session_state.username = username.strip()
-            st.experimental_rerun()  # Ricarica la pagina per aggiornare lo stato
-else:
+            st.session_state.pagina_corrente = "gioco"  # Passa alla pagina del gioco
+
+# Pagina del gioco
+if st.session_state.pagina_corrente == "gioco":
     gioco()
