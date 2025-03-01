@@ -174,9 +174,8 @@ def gioco():
                     # Salva il punteggio nella classifica
                     if "classifica" not in st.session_state:
                         st.session_state.classifica = pd.DataFrame(columns=["Username", "Tempo"])
-                    st.session_state.classifica = st.session_state.classifica.append(
-                        {"Username": st.session_state.username, "Tempo": formatta_tempo(tempo_totale)}, ignore_index=True
-                    )
+                    nuovo_record = pd.DataFrame([{"Username": st.session_state.username, "Tempo": formatta_tempo(tempo_totale)}])
+                    st.session_state.classifica = pd.concat([st.session_state.classifica, nuovo_record], ignore_index=True)
                     st.write("### 🏆 Classifica")
                     st.write(st.session_state.classifica.sort_values(by="Tempo"))
                     if st.button("Ricomincia"):
