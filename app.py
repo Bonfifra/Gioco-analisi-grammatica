@@ -59,7 +59,7 @@ def gioco():
         st.session_state.risposta_corretta = False
 
     # Mostra il cronometro in tempo reale
-    cronometro = st.sidebar.empty()  # Usiamo un placeholder per aggiornare il tempo
+    cronometro = st.sidebar.empty()
     tempo_trascorso = time.time() - st.session_state.inizio
     cronometro.write(f"⏱️ Tempo trascorso: {int(tempo_trascorso)} secondi")
 
@@ -80,9 +80,9 @@ def gioco():
     elif livello == 5:
         st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento Predicativo del Soggetto o dell'Oggetto**.")
 
-    soggetto = st.text_input("Soggetto:", key=f"soggetto_{livello}_{frase_idx}")
-    predicato = st.text_input("Predicato:", key=f"predicato_{livello}_{frase_idx}")
-    complemento = st.text_input("Complemento (se presente):", key=f"complemento_{livello}_{frase_idx}")
+    soggetto = st.text_input("Soggetto:", key=f"soggetto_{livello}_{frase_idx}", value="")
+    predicato = st.text_input("Predicato:", key=f"predicato_{livello}_{frase_idx}", value="")
+    complemento = st.text_input("Complemento (se presente):", key=f"complemento_{livello}_{frase_idx}", value="")
 
     if st.button("Verifica", key=f"verifica_{livello}_{frase_idx}"):
         if not verifica_risposta(soggetto, frase["soggetto"]):
@@ -111,16 +111,13 @@ def gioco():
             st.session_state.risposta_corretta = False
 
             # Passa alla frase successiva o al livello successivo
-            if st.session_state.frase_corrente < len(livelli[livello]):
-                st.session_state.frase_corrente += 1
-            else:
+            if st.session_state.frase_corrente >= len(livelli[livello]):
                 st.session_state.livello_corrente += 1
                 st.session_state.frase_corrente = 0
                 if st.session_state.livello_corrente > len(livelli):
                     fine = time.time()
                     tempo_totale = fine - st.session_state.inizio
                     st.write(f"### 🎉 Hai completato tutti i livelli in {tempo_totale:.2f} secondi!")
-                    
                     # Salva il punteggio nella classifica
                     if "classifica" not in st.session_state:
                         st.session_state.classifica = pd.DataFrame(columns=["Username", "Tempo"])
@@ -129,9 +126,14 @@ def gioco():
                     )
                     st.write("### 🏆 Classifica")
                     st.write(st.session_state.classifica.sort_values(by="Tempo"))
+                    if st.button("Ricomincia"):
+                        st.session_state.livello_corrente = 1
+                        st.session_state.frase_corrente = 0
+                        st.session_state.punteggio = 0
+                        st.session_state.inizio = time.time()
+                        st.session_state.risposta_corretta = False
+                        st.experimental_rerun()
                     return
-
-                # Segnala il passaggio al livello successivo
                 st.balloons()  # Effetto visivo
                 st.write(f"🎉 **Complimenti! Passi al livello {st.session_state.livello_corrente}.**")
 
