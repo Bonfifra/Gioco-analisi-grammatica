@@ -118,6 +118,14 @@ def gioco():
         complemento_predicativo = st.text_input("Complemento Predicativo del Soggetto o dell'Oggetto:", key=f"complemento_predicativo_{livello}_{frase_idx}", value="")
 
     if st.button("Verifica", key=f"verifica_{livello}_{frase_idx}"):
+        # Debug: mostra le risposte inserite e quelle corrette
+        st.write(f"Debug - Soggetto inserito: '{soggetto}', Soggetto corretto: '{frase['soggetto']}'")
+        st.write(f"Debug - Predicato inserito: '{predicato}', Predicato corretto: '{frase['predicato']}'")
+        if livello == 4:
+            st.write(f"Debug - Complemento oggetto inserito: '{complemento_oggetto}', Complemento oggetto corretto: '{frase['complemento_oggetto']}'")
+            st.write(f"Debug - Complemento termine inserito: '{complemento_termine}', Complemento termine corretto: '{frase['complemento_termine']}'")
+
+        # Verifica le risposte
         if not verifica_risposta(soggetto, frase["soggetto"]):
             st.error("Soggetto errato! Riprova.")
         elif not verifica_risposta(predicato, frase["predicato"]):
@@ -131,6 +139,9 @@ def gioco():
                 st.error("Complemento oggetto errato! Riprova.")
             elif "complemento_termine" in frase and not verifica_risposta(complemento_termine, frase["complemento_termine"]):
                 st.error("Complemento di termine errato! Riprova.")
+            else:
+                st.success("Corretto! Complimenti.")
+                st.session_state.risposta_corretta = True
         elif livello == 5 and "complemento_agente" in frase and not verifica_risposta(complemento_agente, frase["complemento_agente"]):
             st.error("Complemento d'agente errato! Riprova.")
         elif livello == 6 and "complemento_predicativo" in frase and not verifica_risposta(complemento_predicativo, frase["complemento_predicativo"]):
