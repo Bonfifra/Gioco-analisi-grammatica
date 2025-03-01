@@ -74,21 +74,36 @@ def gioco():
     if livello == 1:
         st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento Oggetto**.")
     elif livello == 3:
-        st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento di Termine**.")
+        st.write("⚠️ **Nota:** In questo livello, i complementi presenti sono il **Complemento Oggetto** e il **Complemento di Termine**.")
     elif livello == 4:
         st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento d'Agente o di Causa Efficiente**.")
     elif livello == 5:
         st.write("⚠️ **Nota:** In questo livello, il complemento presente è il **Complemento Predicativo del Soggetto o dell'Oggetto**.")
 
+    # Input per soggetto e predicato
     soggetto = st.text_input("Soggetto:", key=f"soggetto_{livello}_{frase_idx}", value="")
     predicato = st.text_input("Predicato:", key=f"predicato_{livello}_{frase_idx}", value="")
-    complemento = st.text_input("Complemento (se presente):", key=f"complemento_{livello}_{frase_idx}", value="")
+
+    # Input per i complementi (gestione diversa per il livello 3)
+    if livello == 3:
+        complemento_oggetto = st.text_input("Complemento Oggetto:", key=f"complemento_oggetto_{livello}_{frase_idx}", value="")
+        complemento_termine = st.text_input("Complemento di Termine:", key=f"complemento_termine_{livello}_{frase_idx}", value="")
+    else:
+        complemento = st.text_input("Complemento (se presente):", key=f"complemento_{livello}_{frase_idx}", value="")
 
     if st.button("Verifica", key=f"verifica_{livello}_{frase_idx}"):
         if not verifica_risposta(soggetto, frase["soggetto"]):
             st.error("Soggetto errato! Riprova.")
         elif not verifica_risposta(predicato, frase["predicato"]):
             st.error("Predicato errato! Riprova.")
+        elif livello == 3:
+            if "complemento_oggetto" in frase and not verifica_risposta(complemento_oggetto, frase["complemento_oggetto"]):
+                st.error("Complemento oggetto errato! Riprova.")
+            elif "complemento_termine" in frase and not verifica_risposta(complemento_termine, frase["complemento_termine"]):
+                st.error("Complemento di termine errato! Riprova.")
+            else:
+                st.success("Corretto! Complimenti.")
+                st.session_state.risposta_corretta = True
         elif "complemento_oggetto" in frase and not verifica_risposta(complemento, frase["complemento_oggetto"]):
             st.error("Complemento oggetto errato! Riprova.")
         elif "complemento_specificazione" in frase and not verifica_risposta(complemento, frase["complemento_specificazione"]):
@@ -136,6 +151,7 @@ def gioco():
                     return
                 st.balloons()  # Effetto visivo
                 st.write(f"🎉 **Complimenti! Passi al livello {st.session_state.livello_corrente}.**")
+            st.experimental_rerun()  # Ricarica la pagina per aggiornare lo stato
 
 # Interfaccia iniziale
 st.title("🎮 Gioco di Analisi Logica")
@@ -148,7 +164,5 @@ if "username" not in st.session_state:
 # Input dell'username
 if st.session_state.username is None:
     username = st.text_input("Username:")
-    if username:
-        st.session_state.username = username
-else:
-    gioco()
+    if username and username.strip():  # Verifica che l'username non sia vuoto
+        st.session_state.username = username.strip()
