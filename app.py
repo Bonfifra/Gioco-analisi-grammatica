@@ -45,31 +45,16 @@ livelli = {
     ]
 }
 
-# Funzione per il passo 1: Inserimento dell'username
-def passo_1():
-    st.title("🎮 Gioco di Analisi Logica")
-    st.write("Benvenuto! Inserisci il tuo username per iniziare.")
-
-    username = st.text_input("Username:")
-    if st.button("Inizia il gioco"):
-        if username and username.strip():  # Verifica che l'username non sia vuoto
-            st.session_state.username = username.strip()
-            st.session_state.passo_corrente = 2  # Passa al passo 2
-            st.session_state.inizio = time.time()  # Memorizza l'ora di inizio
-            st.experimental_rerun()  # Ricarica la pagina
-
-# Funzione per il passo 2: Gioco
-def passo_2():
-    st.title("🎮 Gioco di Analisi Logica")
-    st.write(f"Ciao, {st.session_state.username}! Iniziamo il gioco.")
-
-    # Inizializza lo stato del gioco se non è già stato fatto
+# Funzione principale del gioco
+def gioco():
     if "livello_corrente" not in st.session_state:
         st.session_state.livello_corrente = 1
     if "frase_corrente" not in st.session_state:
         st.session_state.frase_corrente = 0
     if "punteggio" not in st.session_state:
         st.session_state.punteggio = 0
+    if "inizio" not in st.session_state:
+        st.session_state.inizio = time.time()
     if "risposta_corretta" not in st.session_state:
         st.session_state.risposta_corretta = False
 
@@ -99,36 +84,28 @@ def passo_2():
     soggetto = st.text_input("Soggetto:", key=f"soggetto_{livello}_{frase_idx}", value="")
     predicato = st.text_input("Predicato:", key=f"predicato_{livello}_{frase_idx}", value="")
 
-    # Input per i complementi (gestione diversa per il livello 3)
-    if livello == 3:
+    # Input per i complementi (gestione diversa per il livello 3 e 4)
+    if livello >= 3:
         complemento_oggetto = st.text_input("Complemento Oggetto:", key=f"complemento_oggetto_{livello}_{frase_idx}", value="")
         complemento_termine = st.text_input("Complemento di Termine:", key=f"complemento_termine_{livello}_{frase_idx}", value="")
-    else:
-        complemento = st.text_input("Complemento (se presente):", key=f"complemento_{livello}_{frase_idx}", value="")
+    if livello >= 4:
+        complemento_agente = st.text_input("Complemento d'Agente o di Causa Efficiente:", key=f"complemento_agente_{livello}_{frase_idx}", value="")
 
     if st.button("Verifica", key=f"verifica_{livello}_{frase_idx}"):
         if not verifica_risposta(soggetto, frase["soggetto"]):
             st.error("Soggetto errato! Riprova.")
         elif not verifica_risposta(predicato, frase["predicato"]):
             st.error("Predicato errato! Riprova.")
-        elif livello == 3:
+        elif livello >= 3:
             if "complemento_oggetto" in frase and not verifica_risposta(complemento_oggetto, frase["complemento_oggetto"]):
                 st.error("Complemento oggetto errato! Riprova.")
             elif "complemento_termine" in frase and not verifica_risposta(complemento_termine, frase["complemento_termine"]):
                 st.error("Complemento di termine errato! Riprova.")
+            elif livello >= 4 and "complemento_agente" in frase and not verifica_risposta(complemento_agente, frase["complemento_agente"]):
+                st.error("Complemento d'agente errato! Riprova.")
             else:
                 st.success("Corretto! Complimenti.")
                 st.session_state.risposta_corretta = True
-        elif "complemento_oggetto" in frase and not verifica_risposta(complemento, frase["complemento_oggetto"]):
-            st.error("Complemento oggetto errato! Riprova.")
-        elif "complemento_specificazione" in frase and not verifica_risposta(complemento, frase["complemento_specificazione"]):
-            st.error("Complemento di specificazione errato! Riprova.")
-        elif "complemento_termine" in frase and not verifica_risposta(complemento, frase["complemento_termine"]):
-            st.error("Complemento di termine errato! Riprova.")
-        elif "complemento_agente" in frase and not verifica_risposta(complemento, frase["complemento_agente"]):
-            st.error("Complemento d'agente errato! Riprova.")
-        elif "complemento_predicativo" in frase and not verifica_risposta(complemento, frase["complemento_predicativo"]):
-            st.error("Complemento predicativo errato! Riprova.")
         else:
             st.success("Corretto! Complimenti.")
             st.session_state.risposta_corretta = True
@@ -145,52 +122,43 @@ def passo_2():
                 st.session_state.livello_corrente += 1
                 st.session_state.frase_corrente = 0
                 if st.session_state.livello_corrente > len(livelli):
-                    st.session_state.passo_corrente = 3  # Passa al passo 3 (fine del gioco)
-                    st.experimental_rerun()
-                else:
-                    st.balloons()  # Effetto visivo
-                    st.write(f"🎉 **Complimenti! Passi al livello {st.session_state.livello_corrente}.**")
-                    st.experimental_rerun()  # Ricarica la pagina per aggiornare lo stato
+                    fine = time.time()
+                    tempo_totale = fine - st.session_state.inizio
+                    st.write(f"### 🎉 Hai completato tutti i livelli in {tempo_totale:.2f} secondi!")
+                    # Salva il punteggio nella classifica
+                    if "classifica" not in st.session_state:
+                        st.session_state.classifica = pd.DataFrame(columns=["Username", "Tempo"])
+                    st.session_state.classifica = st.session_state.classifica.append(
+                        {"Username": st.session_state.username, "Tempo": tempo_totale}, ignore_index=True
+                    )
+                    st.write("### 🏆 Classifica")
+                    st.write(st.session_state.classifica.sort_values(by="Tempo"))
+                    if st.button("Ricomincia"):
+                        st.session_state.livello_corrente = 1
+                        st.session_state.frase_corrente = 0
+                        st.session_state.punteggio = 0
+                        st.session_state.inizio = time.time()
+                        st.session_state.risposta_corretta = False
+                        st.experimental_rerun()
+                    return
+                st.balloons()  # Effetto visivo
+                st.write(f"🎉 **Complimenti! Passi al livello {st.session_state.livello_corrente}.**")
+            st.experimental_rerun()  # Ricarica la pagina per aggiornare lo stato
 
-# Funzione per il passo 3: Fine del gioco e classifica
-def passo_3():
-    st.title("🎮 Gioco di Analisi Logica")
-    st.write("### 🎉 Hai completato tutti i livelli!")
+# Interfaccia iniziale
+st.title("🎮 Gioco di Analisi Logica")
+st.write("Benvenuto! Inserisci il tuo username per iniziare.")
 
-    # Calcola il tempo totale
-    fine = time.time()
-    tempo_totale = fine - st.session_state.inizio
-    st.write(f"Hai impiegato {int(tempo_totale)} secondi.")
+# Inizializza lo stato dell'app
+if "username" not in st.session_state:
+    st.session_state.username = None
 
-    # Salva il punteggio nella classifica
-    if "classifica" not in st.session_state:
-        st.session_state.classifica = pd.DataFrame(columns=["Username", "Tempo"])
-    st.session_state.classifica = st.session_state.classifica.append(
-        {"Username": st.session_state.username, "Tempo": tempo_totale}, ignore_index=True
-    )
-
-    # Mostra la classifica
-    st.write("### 🏆 Classifica")
-    st.write(st.session_state.classifica.sort_values(by="Tempo"))
-
-    if st.button("Ricomincia"):
-        # Resetta lo stato del gioco
-        st.session_state.passo_corrente = 1
-        st.session_state.username = None
-        st.session_state.livello_corrente = 1
-        st.session_state.frase_corrente = 0
-        st.session_state.punteggio = 0
-        st.session_state.risposta_corretta = False
-        st.experimental_rerun()
-
-# Inizializza lo stato della sessione
-if "passo_corrente" not in st.session_state:
-    st.session_state.passo_corrente = 1
-
-# Mostra il passo corretto
-if st.session_state.passo_corrente == 1:
-    passo_1()
-elif st.session_state.passo_corrente == 2:
-    passo_2()
-elif st.session_state.passo_corrente == 3:
-    passo_3()
+# Input dell'username
+if st.session_state.username is None:
+    username = st.text_input("Username:")
+    if st.button("Inizia il gioco"):
+        if username and username.strip():  # Verifica che l'username non sia vuoto
+            st.session_state.username = username.strip()
+            st.experimental_rerun()  # Ricarica la pagina per aggiornare lo stato
+else:
+    gioco()
